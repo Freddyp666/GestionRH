@@ -38,7 +38,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         // Convertir rol de tu BD al formato que Spring Security entiende
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + usuario.getRole_db().getName()//Ejemplo ROLE_ADMIN, ROLE_RRHH
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + usuario.getRole().getName()//Ejemplo ROLE_ADMIN, ROLE_RRHH
         );
 
         return new User(usuario.getUsername(), usuario.getPassword(), usuario.getEnabled(), true, true, !usuario.getAccountLocked(), Collections.singletonList(authority)

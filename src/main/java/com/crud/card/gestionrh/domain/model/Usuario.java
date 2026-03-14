@@ -23,6 +23,9 @@ public class Usuario {
     @Column(unique = true, nullable = false, length = 100)
     private String username;
 
+    @Column(unique = true, nullable = false, length = 150)
+    private String email;
+
     @Column(name = "password_hash",nullable = false, length = 250)
     private String password;
 
@@ -43,7 +46,7 @@ public class Usuario {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="role_id", nullable = false)
-    private Role_db role_db;
+    private Role role;
 
 
 }

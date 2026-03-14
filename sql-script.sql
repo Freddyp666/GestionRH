@@ -38,11 +38,22 @@ CREATE TABLE role
     description TEXT,
     created_at  TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+ALTER TABLE app_user
+    ADD COLUMN empleado_id BIGINT,
+    ADD CONSTRAINT fk_user_empleado
+        FOREIGN KEY (empleado_id)
+            REFERENCES empleado(id)
+            ON DELETE SET NULL;
 
 INSERT INTO role (name, description)
 VALUES ('ADMIN', 'Administrador del sistema'),
        ('RRHH', 'Recursos Humanos'),
-       ('EMPLOYEE', 'Empleado estándar');
+       ('EMPLOYEE', 'Empleado estándar'),
+       ('GERENTE', 'Gerente de área'),
+       ('CONTADOR', 'Encargado de contabilidad'),
+       ('SUPERVISOR', 'Supervisor de empleados'),
+       ('RECLUTADOR', 'Encargado de contratación');
+
 
 select *
 from role;
@@ -65,6 +76,11 @@ CREATE TABLE app_user
             REFERENCES role (id)
             ON DELETE RESTRICT
 );
+
+-- Actualizar usuarios existentes (ejemplo)
+UPDATE app_user SET empleado_id = 1 WHERE username = 'admin1';
+UPDATE app_user SET empleado_id = 2 WHERE username = 'rrhh1';
+UPDATE app_user SET empleado_id = 3 WHERE username = 'empleado1';
 
 INSERT INTO app_user (username, email, password_hash, role_id)
 VALUES ('admin1', 'admin1@empresa.com', '$2a$10$hashsimulado1', 1),

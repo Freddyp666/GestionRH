@@ -1,15 +1,15 @@
 package com.crud.card.gestionrh.domain.repository;
 
 
-import com.crud.card.gestionrh.domain.model.Role_db;
+import com.crud.card.gestionrh.domain.model.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface RoleRepository extends JpaRepository<Role_db, Long> {
+public interface RoleRepository extends JpaRepository<Role, Long> {
 
-    Optional<Role_db> findByRole(String name);
+    Optional<Role> findByName(String name);
 
-    boolean existsByRole(String name);
+    boolean existsByName(String name);
 
 }

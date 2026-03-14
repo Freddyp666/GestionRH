@@ -14,12 +14,13 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Role_db {
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(unique = true, nullable = false)
-    private String name;
+    private String name;//aqui busacamo el rol por nombre
 
     private String description;
 

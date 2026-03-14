@@ -21,4 +21,6 @@ public class RegisterRequest {
     @Size(min=6, message = "La contrasenia debe tener al menos 6 caracteres")
     private String password;
 
+
+
 }
