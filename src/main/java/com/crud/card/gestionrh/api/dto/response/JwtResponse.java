@@ -16,9 +16,8 @@ public class JwtResponse {
     private List<String> roles;
 
     //Constructor de los campos
-    public JwtResponse(String token, String type, Long id, List<String> roles, String username, String email) {
+    public JwtResponse(String token, Long id, String username, String email, List<String> roles) {
         this.token = token;
-        this.type = type;
         this.id=id;
         this.username = username;
         this.email = email;

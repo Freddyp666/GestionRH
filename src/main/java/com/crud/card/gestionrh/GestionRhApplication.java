@@ -9,7 +9,7 @@ public class GestionRhApplication {
     public static void main(String[] args) {
         SpringApplication.run(GestionRhApplication.class, args);
 
-        System.out.println("Holala");
+        System.out.println("Ejecutando");
     }
 
 }

@@ -1,6 +1,7 @@
 package com.crud.card.gestionrh.api.controller;
 
-import org.springframework.http.HttpStatus;  // ← Agrega esto arriba
+import com.crud.card.gestionrh.api.dto.response.JwtResponse;
+import org.springframework.http.HttpStatus;
 import com.crud.card.gestionrh.api.dto.request.LoginRequest;
 import com.crud.card.gestionrh.api.dto.request.RegisterRequest;
 import com.crud.card.gestionrh.api.dto.response.MensajeResponse;
@@ -14,10 +15,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -33,39 +39,51 @@ public class AuthController {
 
 
     //login
-    /*@PostMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
+        System.out.println("🔵 Intento de login: " + loginRequest.getUsername());
         try {
-            // 1. Autenticar
-            Authentication authentication = authenticationManager.authenticate(
-              new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
-                loginRequest.getPassword()
-              )
-            );
 
-            // 2. Generar token
-            String token = jwtTokenProvider.generateToken(authentication);
+            //  Autenticar el usuario
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-            // 3. Obtener usuario
-            Usuario usuario = usuarioRepository.findByUsername(loginRequest.getUsername())
-              .orElseThrow();
+            //  Guardar la autenticacion en el contexto
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // 4. Devolver respuesta (necesitas crear JwtResponse)
+            //  Generar token
+            String token = jwtTokenProvider.generarToken(authentication);
+
+            // Obtener usuario
+            Usuario usuario = usuarioRepository.findByEmail(loginRequest.getUsername())
+              .orElseGet(()->usuarioRepository.findByUsername(loginRequest.getUsername())
+              .orElseThrow(() -> new RuntimeException("Usuario no encontrado")));
+
+            //Resetear intetnos fallidos (Login exitoso)
+            usuarioRepository.updateFailedAttempts(0, loginRequest.getUsername());
+
+            //Actualizar ultima fecha de acceso
+            usuario.setUpdatedAt(LocalDateTime.now());
+            usuarioRepository.save(usuario);
+
+            //Crear lista de roles para el fronted
+            List<String> roles = Collections.singletonList(usuario.getRole().getName());
+            System.out.println("🟢 Autenticación exitosa para: " + loginRequest.getUsername());
+
+            //  Devolver respuesta (crear JwtResponse)
             return ResponseEntity.ok(new JwtResponse(
               token,
               usuario.getId(),
               usuario.getUsername(),
               usuario.getEmail(),
-              Collections.singletonList(usuario.getRole().getName())
+              roles
             ));
 
+
         } catch (Exception e) {
-            return ResponseEntity
-              .status(HttpStatus.UNAUTHORIZED)
-              .body(new MensajeResponse("Credenciales inválidas"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MensajeResponse("Credenciales inválidas"+e.getMessage()));
         }
-    }*/
+    }
+
 
 
     //Register
@@ -75,7 +93,7 @@ public class AuthController {
         try {
             //Verificar si el usuario existe
             if (usuarioRepository.existsByUsername(registerRequest.getUsername())) {
-                return ResponseEntity.badRequest().body(new MensajeResponse("En nombre de usuario ya existe",false));
+                return ResponseEntity.badRequest().body(new MensajeResponse("En nombre de usuario ya existe", false));
             }
 
             //Verifica si email ya existe
@@ -99,15 +117,13 @@ public class AuthController {
             usuario.setRole(roleEmpleado);//automatico
 
             usuarioRepository.save(usuario);
-            return ResponseEntity
-              .status(HttpStatus.CREATED)
-              .body(new MensajeResponse("Usuario registrado correctamente"));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new MensajeResponse("Usuario registrado correctamente"));
 
         } catch (Exception e) {
             e.printStackTrace();
 
             //devolver la respuesta del error
-            return ResponseEntity.badRequest().body(new MensajeResponse("Error interno del servidor al registro de usuario"+e.getMessage()));
+            return ResponseEntity.badRequest().body(new MensajeResponse("Error interno del servidor al registro de usuario" + e.getMessage()));
         }
 
 

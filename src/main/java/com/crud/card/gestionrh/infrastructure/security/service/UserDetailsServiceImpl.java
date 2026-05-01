@@ -22,9 +22,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
         // Buscar usuario por username (con su rol)
-        Usuario usuario = usuarioRepository.findByUsernameWithRole(username).orElseThrow(() -> new UsernameNotFoundException("Usuario No encontrado: " + username));
+        Usuario usuario = usuarioRepository.findByEmail(usernameOrEmail)
+          .orElseGet(() -> usuarioRepository.findByUsername(usernameOrEmail)
+            .orElseThrow(() -> new UsernameNotFoundException("Usuario No encontrado: " + usernameOrEmail)));
 
         //Verificar si la cuenta está bloqueada
         if (usuario.getAccountLocked()) {
