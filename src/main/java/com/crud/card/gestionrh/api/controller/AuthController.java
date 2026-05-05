@@ -58,8 +58,11 @@ public class AuthController {
               .orElseGet(()->usuarioRepository.findByUsername(loginRequest.getUsername())
               .orElseThrow(() -> new RuntimeException("Usuario no encontrado")));
 
+            //Obtener el userioa de la base de datos
+            String realUser = usuario.getUsername();
+
             //Resetear intetnos fallidos (Login exitoso)
-            usuarioRepository.updateFailedAttempts(0, loginRequest.getUsername());
+            usuarioRepository.updateFailedAttempts(0, realUser);
 
             //Actualizar ultima fecha de acceso
             usuario.setUpdatedAt(LocalDateTime.now());
