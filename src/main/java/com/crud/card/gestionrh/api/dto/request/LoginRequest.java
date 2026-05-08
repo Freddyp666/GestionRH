@@ -7,7 +7,7 @@ import lombok.Data;
 public class LoginRequest {
 
     @NotBlank(message="El email de usuario es Obligatorio")
-    private String username;
+    private String email;
 
     @NotBlank(message="La contrasenia es obligatorio")
     private String password;

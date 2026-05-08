@@ -117,3 +117,4 @@ from department;
 
 select*
 from app_user
+

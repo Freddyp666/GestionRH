@@ -41,11 +41,11 @@ public class AuthController {
     //login
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
-        System.out.println("🔵 Intento de login: " + loginRequest.getUsername());
+        System.out.println("🔵 Intento de login: " + loginRequest.getEmail());
         try {
 
             //  Autenticar el usuario
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
             //  Guardar la autenticacion en el contexto
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -54,9 +54,8 @@ public class AuthController {
             String token = jwtTokenProvider.generarToken(authentication);
 
             // Obtener usuario
-            Usuario usuario = usuarioRepository.findByEmail(loginRequest.getUsername())
-              .orElseGet(()->usuarioRepository.findByUsername(loginRequest.getUsername())
-              .orElseThrow(() -> new RuntimeException("Usuario no encontrado")));
+            Usuario usuario = usuarioRepository.findByEmail(loginRequest.getEmail())
+              .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
             //Obtener el userioa de la base de datos
             String realUser = usuario.getUsername();
@@ -70,7 +69,7 @@ public class AuthController {
 
             //Crear lista de roles para el fronted
             List<String> roles = Collections.singletonList(usuario.getRole().getName());
-            System.out.println("🟢 Autenticación exitosa para: " + loginRequest.getUsername());
+            System.out.println("🟢 Autenticación exitosa para: " + loginRequest.getEmail());
 
             //  Devolver respuesta (crear JwtResponse)
             return ResponseEntity.ok(new JwtResponse(

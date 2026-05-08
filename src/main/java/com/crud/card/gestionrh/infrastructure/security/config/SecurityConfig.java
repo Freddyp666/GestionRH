@@ -29,9 +29,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth->auth
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/v1/empleados/**").permitAll()
-            .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .anyRequest().authenticated());
+            //.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
